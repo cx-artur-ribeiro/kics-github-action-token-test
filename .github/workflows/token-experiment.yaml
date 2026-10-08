@@ -1,0 +1,22 @@
+name: token-update-experiment
+on:
+  pull_request:
+    types: [labeled]
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+jobs:
+  run:
+    if: github.event.label.name == 'run-experiment'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci --ignore-scripts
+      - run: node experiment/run.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
